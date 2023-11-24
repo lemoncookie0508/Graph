@@ -7,8 +7,12 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import lepl.Constant;
 import lepl.CustomFunction;
@@ -58,18 +62,80 @@ public class FunctionPane extends AnchorPane {
                             Color.rgb(139, 0, 255),
                             BorderStrokeStyle.SOLID,
                             CornerRadii.EMPTY,
-                            new BorderWidths(2)
+                            new BorderWidths(4)
                     ));
+    private static final Background
+            gradationButtonBasic = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonBasic.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            )),
+            gradationButtonBasicEntered = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonBasicEntered.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            )),
+            gradationButtonActive = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonActive.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            )),
+            gradationButtonActiveEntered = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonActiveEntered.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            ));
+    private static final Background
+            gradationVectorButtonH = new Background(new BackgroundImage(
+            new Image(Constant.getImageResource("buttonH.png")),
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundRepeat.NO_REPEAT,
+            BackgroundPosition.CENTER,
+            new BackgroundSize(45, 45, false, false, false, false)
+    )),
+            gradationVectorButtonHEntered = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonHEntered.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            )),
+            gradationVectorButtonV = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonV.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            )),
+            gradationVectorButtonVEntered = new Background(new BackgroundImage(
+                    new Image(Constant.getImageResource("buttonVEntered.png")),
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundRepeat.NO_REPEAT,
+                    BackgroundPosition.CENTER,
+                    new BackgroundSize(45, 45, false, false, false, false)
+            ));
 
     private final TextField functionText;
     private final IntOnlyTextField colorR = new IntOnlyTextField(0, 256, "255");
     private final IntOnlyTextField colorG = new IntOnlyTextField(0, 256, "255");
     private final IntOnlyTextField colorB = new IntOnlyTextField(0, 256, "255");
-    private final DoubleOnlyTextField colorA = new DoubleOnlyTextField(0, 1, "1");
+    private final IntOnlyTextField colorR2 = new IntOnlyTextField(0, 256, "255");
+    private final IntOnlyTextField colorG2 = new IntOnlyTextField(0, 256, "255");
+    private final IntOnlyTextField colorB2 = new IntOnlyTextField(0, 256, "255");
+    private final IntOnlyTextField colorA = new IntOnlyTextField(0, 101, "0");
 
-    private final IntOnlyTextField lineWidthText = new IntOnlyTextField(0, 20, "7");
+    private final IntOnlyTextField lineWidthText = new IntOnlyTextField(0, 20, "10");
 
     private static int selectedIndex = -1;
+    private boolean isGradationActive = false, isGradationVectorH = true;
 
     public FunctionPane(String functionString, GraphPane graphPane, SettingPane settingPane) throws  InvalidFunctionException {
         this.graphPane = graphPane;
@@ -82,7 +148,7 @@ public class FunctionPane extends AnchorPane {
         this.canvas = new Canvas(graphPane.getCoordinatePaneWidth(), graphPane.getCoordinatePaneHeight());
         this.gc = canvas.getGraphicsContext2D();
 
-        setPrefSize(1450, 290);
+        setPrefSize(1450, 260);
         setBackground(basicBackground);
         setBorder(basicBorder);
 
@@ -98,66 +164,150 @@ public class FunctionPane extends AnchorPane {
 
         Label colorLabel = new Label("RGB :");
         colorLabel.setPrefSize(130, 90);
-        colorLabel.setLayoutX(40);
-        colorLabel.setLayoutY(160);
+        colorLabel.setLayoutX(20);
+        colorLabel.setLayoutY(146);
         colorLabel.setFont(new Font(40));
         getChildren().add(colorLabel);
 
-        colorR.setPrefSize(120, 90);
-        colorR.setLayoutX(170);
-        colorR.setLayoutY(160);
+        colorR.setPrefSize(110, 40);
+        colorR.setLayoutX(135);
+        colorR.setLayoutY(155);
         colorR.setFont(new Font(40));
         colorR.setFocusTraversable(false);
         colorR.setOnAction(e -> refreshFunction());
         getChildren().add(colorR);
 
-        colorG.setPrefSize(120, 90);
-        colorG.setLayoutX(320);
-        colorG.setLayoutY(160);
+        colorG.setPrefSize(110, 40);
+        colorG.setLayoutX(250);
+        colorG.setLayoutY(155);
         colorG.setFont(new Font(40));
         colorG.setFocusTraversable(false);
         colorG.setOnAction(e -> refreshFunction());
         getChildren().add(colorG);
 
-        colorB.setPrefSize(120, 90);
-        colorB.setLayoutX(470);
-        colorB.setLayoutY(160);
+        colorB.setPrefSize(110, 40);
+        colorB.setLayoutX(365);
+        colorB.setLayoutY(155);
         colorB.setFont(new Font(40));
         colorB.setFocusTraversable(false);
         colorB.setOnAction(e -> refreshFunction());
         getChildren().add(colorB);
 
-        Label lineWidthLabel = new Label("두께 :");
+        Button gradationButton = new Button();
+        Button gradationVectorButton = new Button();
+
+        gradationButton.setPrefSize(45, 45);
+        gradationButton.setLayoutX(480);
+        gradationButton.setLayoutY(146);
+        gradationButton.setBackground(gradationButtonBasic);
+        gradationButton.setOnMouseEntered(mouseEvent -> {
+            if (isGradationActive) gradationButton.setBackground(gradationButtonActiveEntered);
+            else gradationButton.setBackground(gradationButtonBasicEntered);
+        });
+        gradationButton.setOnMouseExited(mouseEvent -> {
+            if (isGradationActive) gradationButton.setBackground(gradationButtonActive);
+            else gradationButton.setBackground(gradationButtonBasic);
+        });
+        gradationButton.setOnAction(actionEvent -> {
+            if (isGradationActive) {
+                gradationButton.setBackground(gradationButtonBasicEntered);
+
+                colorR2.setDisable(true);
+                colorG2.setDisable(true);
+                colorB2.setDisable(true);
+                gradationVectorButton.setDisable(true);
+            } else {
+                gradationButton.setBackground(gradationButtonActiveEntered);
+
+                colorR2.setDisable(false);
+                colorG2.setDisable(false);
+                colorB2.setDisable(false);
+                gradationVectorButton.setDisable(false);
+            }
+            isGradationActive = !isGradationActive;
+            refreshFunction();
+        });
+        getChildren().add(gradationButton);
+
+        gradationVectorButton.setPrefSize(45, 45);
+        gradationVectorButton.setLayoutX(480);
+        gradationVectorButton.setLayoutY(195);
+        gradationVectorButton.setBackground(gradationVectorButtonH);
+        gradationVectorButton.setOnMouseEntered(mouseEvent -> {
+            if (isGradationVectorH) gradationVectorButton.setBackground(gradationVectorButtonHEntered);
+            else gradationVectorButton.setBackground(gradationVectorButtonVEntered);
+        });
+        gradationVectorButton.setOnMouseExited(mouseEvent -> {
+            if (isGradationVectorH) gradationVectorButton.setBackground(gradationVectorButtonH);
+            else gradationVectorButton.setBackground(gradationVectorButtonV);
+        });
+        gradationVectorButton.setOnAction(actionEvent -> {
+            if (isGradationVectorH) {
+                gradationVectorButton.setBackground(gradationVectorButtonVEntered);
+            } else {
+                gradationVectorButton.setBackground(gradationVectorButtonHEntered);
+            }
+            isGradationVectorH = !isGradationVectorH;
+            refreshFunction();
+        });
+        gradationVectorButton.setDisable(true);
+        getChildren().add(gradationVectorButton);
+
+        colorR2.setPrefSize(110, 40);
+        colorR2.setLayoutX(530);
+        colorR2.setLayoutY(155);
+        colorR2.setFont(new Font(40));
+        colorR2.setFocusTraversable(false);
+        colorR2.setOnAction(e -> refreshFunction());
+        colorR2.setDisable(true);
+        getChildren().add(colorR2);
+
+        colorG2.setPrefSize(110, 40);
+        colorG2.setLayoutX(645);
+        colorG2.setLayoutY(155);
+        colorG2.setFont(new Font(40));
+        colorG2.setFocusTraversable(false);
+        colorG2.setOnAction(e -> refreshFunction());
+        colorG2.setDisable(true);
+        getChildren().add(colorG2);
+
+        colorB2.setPrefSize(110, 40);
+        colorB2.setLayoutX(760);
+        colorB2.setLayoutY(155);
+        colorB2.setFont(new Font(40));
+        colorB2.setFocusTraversable(false);
+        colorB2.setOnAction(e -> refreshFunction());
+        colorB2.setDisable(true);
+        getChildren().add(colorB2);
+
+        Label lineWidthLabel = new Label("폭 :");
         lineWidthLabel.setPrefSize(120, 90);
-        lineWidthLabel.setLayoutX(630);
-        lineWidthLabel.setLayoutY(160);
+        lineWidthLabel.setLayoutX(895);
+        lineWidthLabel.setLayoutY(146);
         lineWidthLabel.setFont(new Font(40));
         getChildren().add(lineWidthLabel);
 
-        lineWidthText.setPrefSize(110, 90);
-        lineWidthText.setLayoutX(760);
-        lineWidthText.setLayoutY(160);
+        lineWidthText.setPrefSize(90, 40);
+        lineWidthText.setLayoutX(975);//730
+        lineWidthText.setLayoutY(155);
         lineWidthText.setFont(new Font(40));
         lineWidthText.setFocusTraversable(false);
         lineWidthText.setOnAction(e -> refreshFunction());
         getChildren().add(lineWidthText);
 
-        Label AlphaLabel = new Label("불투명도 :");
-        AlphaLabel.setPrefSize(200, 90);
-        AlphaLabel.setLayoutX(900);
-        AlphaLabel.setLayoutY(160);
+        Label AlphaLabel = new Label("투명 :");
+        AlphaLabel.setPrefSize(120, 90);
+        AlphaLabel.setLayoutX(1090);
+        AlphaLabel.setLayoutY(146);
         AlphaLabel.setFont(new Font(40));
         getChildren().add(AlphaLabel);
 
-        colorA.setPrefSize(120, 90);
-        colorA.setLayoutX(1100);
-        colorA.setLayoutY(160);
+        colorA.setPrefSize(110, 40);
+        colorA.setLayoutX(1210);
+        colorA.setLayoutY(158);
         colorA.setFont(new Font(40));
         colorA.setFocusTraversable(false);
-        colorA.setOnAction(e -> {
-            colorA.action();
-            refreshFunction();
-        });
+        colorA.setOnAction(e -> refreshFunction());
         getChildren().add(colorA);
 
         graphPane.add(canvas);
@@ -167,23 +317,27 @@ public class FunctionPane extends AnchorPane {
         deleteButton.setPrefSize(60, 60);
         deleteButton.setFont(Font.loadFont(Constant.getResource("fonts/HanSantteutDotum-Regular.TTF"), 50));
         deleteButton.setLayoutX(1335);
-        deleteButton.setLayoutY(170);
+        deleteButton.setLayoutY(10);
         deleteButton.setBackground(deleteButtonBackground);
-        deleteButton.setOnMouseEntered(mouseEvent -> deleteButton.setTextFill(Color.rgb(100, 100, 100)));
+        deleteButton.setOnMouseEntered(mouseEvent -> deleteButton.setTextFill(Color.rgb(200, 0, 0)));
         deleteButton.setOnMouseExited(mouseEvent -> deleteButton.setTextFill(Color.BLACK));
         deleteButton.setOnAction(actionEvent -> {
+            if (selectedIndex >= 0) {
+                ((FunctionPane) settingPane.getFunctionList().get(selectedIndex)).setBorder(basicBorder);
+                selectedIndex = -1;
+            }
             graphPane.remove(canvas);
             settingPane.remove(this);
         });
         getChildren().add(deleteButton);
 
         Button swapButton = new Button("≡");
-        swapButton.setPrefSize(115, 60);
+        swapButton.setPrefSize(115, 40);
         swapButton.setFont(Font.loadFont(Constant.getResource("fonts/HanSantteutDotum-Regular.TTF"), 50));
-        swapButton.setLayoutX(1325);
-        swapButton.setLayoutY(10);
+        swapButton.setLayoutX(1330);
+        swapButton.setLayoutY(158);
         swapButton.setBackground(deleteButtonBackground);
-        swapButton.setOnMouseEntered(mouseEvent -> swapButton.setTextFill(Color.rgb(100, 100, 100)));
+        swapButton.setOnMouseEntered(mouseEvent -> swapButton.setTextFill(Color.rgb(139, 0, 255)));
         swapButton.setOnMouseExited(mouseEvent -> swapButton.setTextFill(Color.BLACK));
         swapButton.setOnAction(actionEvent -> {
             int i = settingPane.getFunctionList().indexOf(this);
@@ -199,6 +353,11 @@ public class FunctionPane extends AnchorPane {
             }
         });
         getChildren().add(swapButton);
+
+        if (selectedIndex >= 0) {
+            ((FunctionPane) settingPane.getFunctionList().get(selectedIndex)).setBorder(basicBorder);
+            selectedIndex = -1;
+        }
     }
 
     public boolean isCurve(String fs) {
@@ -222,12 +381,26 @@ public class FunctionPane extends AnchorPane {
                 colorR.getTextInt(),
                 colorG.getTextInt(),
                 colorB.getTextInt(),
-                colorA.getTextDouble()
+                1 - colorA.getTextInt() / 100D
         );
-        gc.setStroke(color);
+        double centerX = graphPane.getCoordinatePaneWidth() / 2;
+
+        if (isGradationActive) {
+            Color color2 = Color.rgb(
+                    colorR2.getTextInt(),
+                    colorG2.getTextInt(),
+                    colorB2.getTextInt(),
+                    1 - colorA.getTextInt() / 100D
+            );
+            LinearGradient gradient = new LinearGradient(0, 0, isGradationVectorH ? 1 : 0, isGradationVectorH ? 0 : 1, true, CycleMethod.NO_CYCLE,
+                    List.of(new Stop(0, color), new Stop(1, color2))
+            );
+            gc.setStroke(gradient);
+
+        } else gc.setStroke(color);
+
         gc.setLineWidth(lineWidthText.getTextInt());
 
-        double centerX = graphPane.getCoordinatePaneWidth() / 2;
         if (function != null) {
             for (double x = -centerX; x <= centerX; x++) {
                 double x1 = centerX + x, y1 = graphPane.getCoordinatePaneHeight() / 2 - function.get(x);
